@@ -1,0 +1,1296 @@
+https://mkyong.com/mongodb/java-mongodb-query-document/
+https://twinw.tistory.com/207
+https://mongodb.github.io/mongo-java-driver/3.12/javadoc/
+
+mongodb jdbc driver
+https://dbschema.com/jdbc-driver/MongoDb.html
+
+# NoSQL (Not only SQL)
+- RDBMS의 한계를 극복하기 위해 만들어진 새로운 형태의 데이터저장소
+--------------------------------------------------
+	SQL			NOSQL
+--------------------------------------------------
+정해진 규격				정해진 규격 없음
+(Scheme, Table, Column)
+--------------------------------------------------
+join 가능				join 불가능
+--------------------------------------------------
+트랜잭션 사용			트랜잭션 사용x
+--------------------------------------------------
+분산처리 어려움			분산처리 쉬움
+--------------------------------------------------
+
+MongoDB
+- 몽고DB는 NoSQL 중 가장 많이 쓰이는 비관계형 데이터베이스 관리 시스템으로 자유 오픈소스 소프트웨어이다
+-  NoSQL DB 종류 가운데 Document DB로써 데이터 객체들이 컬렉션 내부에서 독립된 문서로 저장되는 모델이다.
+
+# 특징
+
+[1] Document-Oriented Storage: 모든 데이터가 JSON 형태로 저장되며 스키마가 없음
+스키마가 없기 때문에 복잡한 구조를 쉽게 저장할 수 있다.
+
+[2] Full Index Support: RDBMS에 뒤지지 않는 다양한 인덱싱 제공
+강력한 인덱스 기능 덕분에 거의 모든 쿼리들을 빠르게 처리할 수 있다.
+[3] Replication & High Availability: 데이터 복제를 통한 가용성 향상
+[4] Auto-Sharing: Primary key를 기반으로 여러 서버에 데이터를 나누는 scale-out이 가능
+[5] Querying: Key 기반의 get, put뿐만 아니라 다양한 종류의 쿼리 제공
+강력한 쿼리 기능과 다양한 쿼리를 지원한다.
+[6] Fast In-Place Updates: 고성능 atomic operation 지원
+[7] MapReduce: 맵리듀스 지원
+
+[8]GridFS:
+별도의 스토리지 엔진을 통해 파일 저장. 스토리지 엔진에서 DB 엔진을 분리하는 새로운 아키텍처를 도입
+몽고DB의 기본 스토리지 엔진인 와이어드 타이거(Wired Tiger)는 높은 쓰기 성능을 제공하고, 압축을 기본 내장해 더 적은 스토리지 비용을 요구
+별개의 인메모리와 암호화 데이터스토어를 추가. 또한 몽고DB는 스파크 커넥터를 제공해 대용량 인메모리 분석을 지원
+----------------------------------------------------
+redis : 메모리 캐쉬에다 저장함
+카산드라
+몽고db : document기반으로 데이터를 저장한다. (json기반의 document기반 데이터관리)
+	json 기반의 데이터 포맷을 가지고 데이터를 관리한다.
+	데이터: 정수, 실수, 문자(string), 
+		csv 포맷, json포맷
+		JSON (Javascript Object Notation)
+		{"id":"a01", "lang":"python","version":3}
+	MongoDB의 Document예
+
+	
+hbase
+----------------------------------------------------
+MongoDB 데이터 구조
+- DataBase (캐비넷)
+	+--Collection(table대신) (서류철)
+		+----Document(row대신. column개념이 없음) (서류)
+- collection에 json형태의 document를 넣는다
+- document하나가 하나의 레코드임
+
+예
+{ 
+    "ID" : "A-01", 
+    "name" : "Adams", 
+    "dept" : "Sales", 
+    "_id" : ObjectId("624d7b4525ae1837ed2b5fce")
+}
+- 도큐먼트는 JSON과 유사한 BSON(Binary JSON)구조.
+- 필드와 값으로 구성
+- 필드에는 문자열만 들어감
+- 값에는 배열, 숫자, 3차원 위치좌표, 오브젝트 등이 들어갈 수 있다.
+----------------------------------------------------
+전통DB	&	몽고DB	유사개념비교
+------------------------------------------
+Database	Database
+------------------------------------------
+Table		Collection
+------------------------------------------
+Row		Document
+------------------------------------------
+Index		Index
+------------------------------------------
+Count		estimated_document_count()
+---------------------
+데이터출력은 전통DB는 while반복문선호
+몽고DB는 for반복문선호
+----------------------------------------------------
+# MongoDB 설치
+https://www.mongodb.com/try/download/community
+1.2.2  2.2. mongodb 설치 방법 (윈도우 환경)
+https://www.mongodb.com/download-center/community 이동 후, .msi 파일 다운로드 및 설치
+참고 블로그: https://javacpro.tistory.com/64
+
+[1] Community Server를 Windows msi로 다운로드하여 설치한다. 디폴트로 설치하면 된다.
+[2] 설치후 제어판> 시스템 > 고급 > 환경변수 > 
+path=%PATH%;C:\Program Files\MongoDB\Server\5.0\bin;
+를 추가한다.
+[3] C디렉토리 아래 data\db 라는 디렉토리를 생성한다. (반드시 C밑에 data/db로 만들어주자)
+[4] cmd 창을 열어 mongod를 입력하고 엔터를 쳐본다.
+----------------------------------------------------
+(맥 환경) mongodb 설치 방법
+Homebrew 프로그램을 사용해서 설치하는 것이 가장 쉬움
+
+https://brew.sh/index_ko
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+Homebrew 설치 후
+
+brew install mongodb
+mongodb 설치 후
+
+mongod 또는 brew services start mongodb
+
+----------------------------------------------------
+Robomongo설치(몽고디비 gui툴)
+https://studio3t.com/download-studio3t-free
+studio-3t-x64 다운로드하여 설치한다
+
+New Connection 하여 새로운 커넥션을 만든 뒤
+오른 마우스 Add Database해서 mydb를 생성하자
+그런뒤 Collection오른 마우스 Add Collection해서 mycollection생성
+그런뒤 Add Document해서 데이터를 insert한다.
+
+_id 는 Document를 unique 하게 식별할 수 있는 값이 자동으로 들어간다
+몽고디비는 collection에서 _id가 Document마다 자동생성되어 primary key역할을 한다.
+컬럼마다 데이터 타입을 정할 필요 없다.
+----------------------------------------------------
+Robomongo에서 커맨드 입력해보기
+IntelliShell에서
+show dbs
+전체 데이터베이스 조회
+
+use mydb
+show collections
+
+db.dropDatabase() 현재 데이터베이스 삭제
+db.collection.drop() collection 삭제
+db.collection.renameCollection('변경할이름')
+-----------------------------------------------------
+
+use mydb
+show collections
+
+//컬렉션에 있는 모든 도큐먼트 보기
+db.mycollection.find()
+
+//db의 통계 정보를 보여줌
+db.stats()
+
+
+// collection 생성 및 삭제
+db.createCollection("employees",{capped:true, size:10000})
+//capped:true => 최초 제한된 크기로 생성된 공간에서만 데이터를 저장하는 설정
+//(고성능, 저장공간 차면 기존 공간 재사용. 일정시간만 저장하는 로그에 적합)
+
+db.employees.isCapped()
+db.mydb.isCapped()
+
+show collections
+
+db.employees.stats()
+
+db.employees.renameCollection("emp")
+
+db.emp.drop()
+
+show collections
+----------------------------------------------------
+#컬렉션 생성 및 capped옵션 살펴보기
+
+//컬렉션 생성
+db.createCollection('cappedCollection',{capped:true, size:10000})
+//capped:true => 최초 제한된 크기로 생성된 공간에서만 데이터를 저장하는 설정
+//(고성능, 저장공간 차면 기존 공간 재사용. 일정시간만 저장하는 로그에 적합)
+
+show collections
+db.cappedCollection.stats()
+//maxSize가 10240으로 되어 있는 것 확인. 10000값보다 크면서 가장 가까운 256의 배수로 10240이 설정된 것
+//이제 도큐먼트를 제한된 크기를 초과하도록 반복문을 이용해서 넣어보자
+for(i=0;i<1000;i++){
+    db.cappedCollection.insertOne({x:i})
+}
+db.cappedCollection.find()
+db.cappedCollection.find().count()
+//처음 넣었던 데이터들이 사라진것 확인할 수 있다.
+db.cappedCollection.stats()
+//collection의 size값이 10230으로 maxSize보다 작게 유지되고 있는 것 확인 가능하다
+//capped컬렉션의 총크기가 처음 설정한 값을 넘지 않음. 컬렉션 크기는 10230이지만
+//실제로 물리적 저장장치에 저장된 값(storageSize)는 더 크다
+//몽고디비는 컬렉션 내부의 도큐먼트뿐 아니라 컬렉션에 대한 정보도 함께 저장하기 때문에
+//실제 저장된 크기와 컬렉션의 크기 사이에는 오차가 있다
+ 
+db.cappedCollection.isCapped() //true
+db.testDB.isCapped() //false
+=============================================================================
+# 도큐먼트 생성
+----------------------------------------------------
+CRUD
+C : insert_one, insert_many, insert, save
+R : find_one, find
+U : update_one, update_many
+D : delete_one, delete_many
+
+----------------------------------------------------
+[1] CREATE : 
+	insertOne : 한 개의 document생성
+	insertMany : list of document 생성
+
+	#syntax
+	db.emp.insertOne(		<---collection
+		{						
+			ID:'A001',	<---field: value---+---	<---document
+			name:'tom',	<---field: value---+
+			dept:'sales'	<---field: value---+
+		}
+	)
+use mydb
+
+db.createCollection('member')
+
+db.member.insertOne({
+	name:'홍길동',
+	userid:'hong',
+	tel:'010-222-3333',
+	age:20
+})
+
+db.getCollection('member').find({})
+--------------------------------------
+# _id 필드
+문서에 _id필드가 추가되었다. 이 필드는 문서의 유일성을 보장하기 위해 관리하는 키다.
+문서 삽입시점에 별도로 지정되지 않으면 자체로 유일한 값을 생성하여 할당한다
+이값은 자동으로 생성하는 값이기 때문에 같은 값을 삽입하더라도 매번 달라질 수 있다.
+만약 _id값을 직접 할당하고 싶다면 다음과 같이 값을 지정하면 된다.
+db.emp.insert({_id:1,name:'Kim', dept:'Research'})
+하지만 권하진 않는다=> 같은 데이터가 중복되면 에러 발생함
+
+문서를 삽입하려고 할 때 몽고디비 드라이버에서 하는 동작은
+[1] 몽고디비에 삽입되는 문서의 고유 id인 _id 필드와 값을 생성한다
+[2] 문서를 몽고디비용 포맷인 BSON으로 변환한다.
+[3] 네트워크 소켓을 통해 데이터베이스로 데이터를 전달한다
+
+-  _id 필드가 지정되면 컬렉션에서 항상 색인(Index)된다. =>검색을 빠르게 함
+- 한 컬렉션에서 중복 불가
+- 한번 삽입된 _id는 변경할 수 없다.
+- _id 필드는 자동 생성될 때 BSON의 ObjectId라는 바이너리포맷의 특수 타입을 사용해 추가되며,
+  배열을 제외하고는 어떤 타입으로도 사용할 수 있다.
+- 전체12bytes : 
+	첫 4bytes는 현재timestamp, => 문서의 생성 시점을 알 수 있음
+	다음 3byte는 machine id, 
+	다음 2byte는 MongoDB 프로세스id, 
+	마지막3byte는  순차번호
+
+
+db.member.insertMany([
+	{name:'홍길동',userid:'hong',tel:'010-1222-3333',age:20, grade:'A'},	
+	{name:'김수지',userid:'kim',tel:'010-2222-3333',age:22, grade:'C'},
+	{name:'신철민',userid:'shin',tel:'010-3222-3333',age:25, grade:'B'},
+	{name:'김유신',userid:'youshin',tel:'010-3222-3333',age:25, grade:'C'}
+]);
+- 대규모의 문서를 삽입할 때는 insertMany()함수에 배열로 여러 문서를 정달하면 된다.
+- 대규모 삽입을 지원하는 모든 드라이버는 ContinueOnError라는 옵션을 구현해야 하는데,
+  이 옵션 값이 false(디폴트)라면=> 대규모 삽입을 수행하던 중 하나라도 실패가 발생하면 삽입을 중단한다.
+  true일 때는 오류가 발생해도 이를 무시하고 계속해서 다음 문서 삽입을 처리한다.
+--------------------------------------------------------------------------------------------------------
+db.user.insertOne({name:'HongGildon', userid:'hong', passwd:'1111'})
+db.user.find().pretty()
+//_id 필드가 생긴것을 확인=> 식별자 역할. PK. 생성할때 따로 넣지 않으면 자동으로 생성함
+//만약 내가 넣고 싶다면 _id값을 명시적으로 넣으면 된다.
+//배열에 담아 넣을 수도 있다. 
+db.user.insert([{_id:1,name:'김철',userid:'kim1',passwd:'2222'},
+{_id:2,name:'이화수',userid:'Lee',passwd:'3333'}])
+
+db.user.insert({_id:1,name:'최치수',userid:'choi',passwd:'5555'})
+===>에러 발생한다. _id가 중복되므로
+
+/*
+WriteResult({
+	"nInserted" : 0,
+	"writeError" : {
+		"code" : 11000,
+		"errmsg" : "E11000 duplicate key error collection: 
+		testDB.user index: _id_ dup key: { _id: 1.0 }"
+	}
+})
+*/
+
+db.user.insertMany([{_id:2,name:'표치수',userid:'choi',passwd:'5555'},
+{_id:5,name:'최철수',userid:'choi',passwd:'5555'}],
+{'ordered':false})
+//ordered옵션의 기본값은 true. 순서대로 삽입할지 여부를 지정. false를 주면 순서대로 입력을 상관하지 않음
+//따라서 중복키로 에러가 발생해도 그 이후의 중복되지 않는 레코드는 삽입된다.
+/*
+BulkWriteError({
+	"writeErrors" : [ ===>에러 발생 중복키이므로
+		{
+			"index" : 0,
+			"code" : 11000,
+			"errmsg" : "E11000 duplicate key error collection: testDB.user index: _id_ dup key: { _id: 2.0 }",
+			"op" : {
+				"_id" : 2,
+				"name" : "표치수",
+				"userid" : "choi",
+				"passwd" : "5555"
+			}
+		}
+	],
+	"writeConcernErrors" : [ ],
+	"nInserted" : 1, ====>성공적으로 삽입된 도큐먼트수
+	"nUpserted" : 0,
+	"nMatched" : 0, 도큐먼트 조회에 성공한 횟수
+	"nModified" : 0, 
+	"nRemoved" : 0, 도큐먼트 삭제 성공 횟수
+	"upserted" : [ ]
+}) :
+*/
+insertMany()를 이용하다 에러가 나면 WriteError대신 BulkWriteError발생함.
+--------------------------------------------------------------------------
+# 원자성
+데이터베이스에는 작업이 '완료된 상태'가 되거나 '완료되기 전' 상태만 존재하지 그 중간 상태는
+존재하지 않음을 의미한다.
+insertOne()함수의 경우 따로 어떤 작업을 하지 않아도 원자성을 가진다
+하지만 insertMany()의 경우 각각 하나 하나의 도큐먼트에는 원자성이 적용되지만
+입력하는 모든 도큐먼트에 대해 원자성이 적용되지는 않는다.
+즉 도큐먼트 2개를 넣는데 하나는 성공하나 다른 하나는 실패할 수 있다.
+==> 몽고디비4.0버전부터 트랜잭션 기능이 생겨 이 명령어로 여러 가지 작업에
+대한 원자성을 성립시킬 수 있게 되었다.
+------------------------------------------------------------
+[실습1]---------------------------------------------------------------------
+1. boardDB생성
+2. board 컬렉션 생성
+3. board 컬렉션에 name 필드값으로 "자유게시판"을 넣어본다
+4. article 컬렉션을 만들어 document들을 삽입하되,
+   bid필드에 3에서 만든 board컬렉션 자유게시판의 _id값이 참조되도록 처리해보자.
+
+5. 똑 같은 방법으로 "공지사항게시판"을 만들고 그 안에 공지사항 글을 작성하자.
+--------------------------------------------------------------------------
+use boardDB
+db.article.drop()
+db.board.drop()
+freeboard_res=db.board.insertOne({name:'자유게시판'})
+//자유게시판 이름의 도큐먼트를 board 컬렉션에 생성하고 그 _id값을
+//기억해야 그 다음 작업으로 게시판에 속한 글을 쓸때 편리하다
+freeboard_id=freeboard_res.insertedId
+db.article.insertMany([
+{bid:freeboard_id, title:'처음 쓰는 글',content:'안녕하세요?', writer:'kim'},
+{bid:freeboard_id, title:'두번째 쓰는 글',content:'Hello?', writer:'kim'},
+{bid:freeboard_id, title:'세번째 쓰는 글',content:'Bonjour?', writer:'kim'}
+])
+db.article.find()
+
+//db.board.remove({name:'공지사항게시판'})
+notice_res=db.board.insertOne({name:'공지사항게시판'})
+notice_id=notice_res.insertedId
+
+db.notice.insertOne({bid:notice_id,title:'오늘 모임 공지합니다',content:'저녁 6시에 신촌에서 모입시다',writer:'admin'})
+
+db.board.find()
+
+db.notice.find()
+db.freeboard.find()
+--------------------------------------------------------------------------
+[실습2]
+1. employees Collection 생성 {capped:true, size:100000} Capped Collection, size는 100000 으로 생성
+2. 다음 Document 데이터 넣기 
+  => insertOne()으로 3개 문서 삽입, 
+     insertMany로 4개 문서 삽입해보기
+- empno가 7369, ename:'SMITH', sal:800, deptno: 20, job:'CLERK'
+- empno가 7499, ename:'ALLEN', sal:1600, deptno: 30, job:'SALESMAN', comm:300
+- empno가 7521, ename:'WARD', sal:1250, deptno: 30,job:'SALESMAN', comm:0
+- empno가 7566, ename:'JONES', sal:2975, deptno: 20, job:'MANAGER'
+- empno가 7654, ename:'MARTIN', sal:1250, deptno: 30, job:'SALESMAN', comm:800
+- empno가 7782, ename:'CLARK', sal:2450, deptno: 10, job:'MANAGER'
+- empno가 7934, ename:'MILLER', sal:1300, deptno: 10, job:'CLERK'
+--------------------------------------------------------------------------------------------------------
+db.employees.insertOne({empno:7369, ename:'SMITH', sal:800, deptno:20, job:'CLERK'})
+db.employees.insertOne({empno:7499, ename:'ALLEN', sal:1600, deptno:30, job:'SALESMAN', comm:300})
+db.employees.insertOne({empno:7521, ename:'WARD', sal:1250, deptno:30, job:'SALESMAN', comm:0})
+
+db.employees.insertMany([
+{empno:7566, ename:'JONES', sal:2975, deptno:20, job:'MANAGER'},
+{empno:7654, ename:'MARTIN', sal:1200, deptno:30, job:'SALESMAN', comm:800},
+{empno:7782, ename:'CLARK', sal:2450, deptno:10, job:'MANAGER'},
+{empno:7934, ename:'MILLER', sal:1300, deptno:10, job:'CLERK'}
+])
+--------------------------------------------------------------------------------------------------------
+
+[2] READ
+- findOne : 매칭되는 한 개의 document 검색
+- find : 매칭되는 list of document 검색
+find({{조건},{필드들}})
+db.member.find() <= select * from member
+db.member.find().toArray() ==> 모든 도큐먼트를 배열로 반환한다. 모든값이 필요할때만 사용. 비효율적
+
+db.member.find({},{name:1,userid:1}) <= select _id, name,userid from member  
+1의 의미는 해당 컬럼만 보고싶다는 의미. true값으로 대신해도 된다. _id는 디폴트로 가져온다.
+db.member.find({},{name:1,userid:1, _id:0}) 
+<= select name,userid from member  0의 의미는 해당 컬럼은 제외시키겠단 의미로 대신 false를 기재해도 된다
+db.member.find({age:20}) <= select * from member where age=20
+
+db.member.find({age:20, userid:'hong'}) 
+<= select * from member where age=20 and userid='hong'
+db.member.find({  $or:  [{age:20},{userid:'kim'}] })  
+<= select * from member where age=20 or userid='kim'
+--------------------------------------------------
+비교 문법
+$eq     =    
+$gt     >    
+$gte    >=   
+$in          목록 중의 어느 하나라도 있는지 여부를 체크
+$lt     <    
+$lte    <=   
+$ne     !=   not equal
+$nin         $in의 반대. not in
+
+논리연산
+$and : 배열안 두개 이상의 조건이 모두 참인 경우를 반환 
+$or  : 배열안 두개 이상의 조건 중 하나라도 참인 경우를 반환 
+$nor : $or의 반대. 배열안 두개 이상의 조건이 모두 아닌 경우 를 반환
+------------------------------------------------------------------------------------------
+[실습] 
+<1> userid가 shin 인 document의 name, userid, tel을 가져오기
+db.member.find({'userid':'shin'},{'name':1, 'userid':1, 'tel':1,_id:0});
+<2> age가 25세 이거나 이름이 김수지인 회원의 모든 정보 가져오기
+db.member.find({$or: [{age:25},{name:'김수지'} ]},{_id:0});
+<3> 나이가 22세 초과인 회원의 이름,나이만 가져오기
+db.member.find({age:{$gt:22}},{name:1,age:1,_id:0});
+-------------------
+<4> employees에서 사원의 이름과 급여를 가져와 보여주세요
+<5> employees에서 담당 업무가 'MANAGER'인 사원의 사번,이름,업무를 보여주세요
+<6> employees에서 급여가 3000 이상인 사원의 사원번호,이름,	담당업무,급여를 출력하세요
+<7> employees에서 급여가 1300에서 2000사이의 사원의 이름,업무,급여,
+	부서번호를 출력하세요
+<8>	employees에서 사원번호가 7369,7654,7934인 사원의 사원번호,
+	이름,업무,급여,입사일자를 출력하세요.
+<9>	employees에서부서번호가 20번 부서인 사원의 이름,업무,부서번호를 출력하세요
+<10> employees에서	부서번호가 20번 부서가 아닌 사원의 이름,업무,부서번호를 출력하세요
+<11> employees에서업무가 CLERK이거나 MANAGER인 사원의 모든 정보를 출력하세요
+<12> employees에서업무가 CLERK이거나 MANAGER가 아닌 사원의 모든 정보를 출력하세요
+------------------------------------------------------------------------------------------
+//<4> employees에서 사원의 이름과 급여를 가져와 보여주세요
+db.employees.find({},{ename:1, sal:1})
+
+//<5> employees에서 담당 업무가 'MANAGER'인 사원의 사번,이름,업무를 보여주세요
+db.employees.find({sal:{$gte:300}},{empno:1,ename:1, job:1, sal:1})
+
+//<6> employees에서 급여가 3000 이상인 사원의 사원번호,이름,담당업무,급여를 출력하세요
+db.employees.find({job:'MANAGER'},{empno:1, ename:1, job:1})
+
+//<7> employees에서 급여가 1300에서 2000사이의 사원의 이름,업무,급여,	부서번호를 출력하세요
+db.employees.find({$and:[{sal:{$gte:1300}},{sal:{$lte:2000}}]},{ename:1, job:1, sal:1})
+
+//<8>employees에서 사원번호가 7369,7654,7934인 사원의 사원번호,
+//	이름,업무,급여를 출력하세요.
+db.employees.find({empno:{$in:[7369,7654,7934]}},{empno:1,ename:1, job:1, sal:1})
+//<9>20번 부서인 사원의 이름,업무,부서번호를 출력하세요
+db.employees.find({deptno:20},{ename:1, job:1, deptno:1})
+//<10>	부서번호가 20번 부서가 아닌 사원의 이름,업무,부서번호를 출력하세요
+db.employees.find({deptno:{$ne:20}},{ename:1, job:1, deptno:1})
+
+//<11> employees에서업무가 CLERK이거나 MANAGER인 사원의 모든 정보를 출력하세요
+db.employees.find({$or:[{job:'CLERK'},{job:'MANAGER'}]})
+db.employees.find({job:{$in:['CLERK','MANAGER']}})
+
+//<12> employees에서업무가 CLERK이거나 MANAGER가 아닌 사원의 모든 정보를 출력하세요
+db.employees.find({$nor:[{job:'CLERK'},{job:'MANAGER'}]})
+db.employees.find({job:{$nin:['CLERK','MANAGER']}})
+=======================================================================
+[like절]
+#정규식 사용
+db.member.find({userid:{$regex:/im/}}); <= userid에 im자가 들어가있는 회원정보 가져오기
+db.member.find({userid:/sh/}) <= userid에 sh가 들어가있는 회원정보 like '%sh%'
+db.member.find({userid:/^sh/}) <= sh로 시작하는 회원정보  like 'sh%'
+db.member.find({userid:/in$/}) <= in으로 끝나는 회원정보  like '%in'
+
+/*[실습]------------------------------
+<1> employees에서 이름이 S로 시작하는 사람의 정보를 보여주세요
+<2>이름 중 S로 끝나는 사람의 정보를 보여주세요
+<3>이름 중 E자가 들어가는 사람의 정보를 보여주세요.
+----------------------------------------
+*/
+db.employees.find({ename:/^S/})
+db.employees.find({ename:/S$/})
+db.employees.find({ename:/E/})
+=======================================================================
+[order by절]
+
+db.member.find({age:{$lte:22}}).sort({age:1}); <= order by age asc
+db.member.find({age:{$lte:22}}).sort({age:-1}); <= order by age desc
+[실습]
+<1>member에서 회원의 나이를 내림차순으로 정렬하고, 
+  같은 나이일 때는 이름 가나다순으로 정렬해서 출력하세요
+<2> employees에서 부서번호로 정렬한 후 부서번호가 같을 경우
+	급여가 많은 순으로 정렬하여 사번,이름,부서번호,급여를 출력하세요
+<3> employees에서 부서번호가 10,20인 사원의 이름,부서번호,업무를 출력하되
+    이름 순으로 정렬하시오
+--------------------------------------------------------
+//<1> 회원의 나이를 내림차순으로 정렬하고, 같은 나이일 때는 이름 가나다순으로 정렬해서 출력하세요
+db.member.find().sort({age:-1,name:1})
+
+/*<2> employees에서 부서번호로 정렬한 후 부서번호가 같을 경우
+	급여가 많은 순으로 정렬하여 사번,이름,부서번호,급여를 출력하세요*/
+db.employees.find({},{deptno:1,empno:1,ename:1,sal:1}).sort({deptno:1, sal:-1})	
+
+//<3> employees에서 부서번호가 10,20인 사원의 이름,부서번호,업무를 출력하되
+//	    이름 순으로 정렬하시오
+db.employees.find({deptno:{$in:[10,20]}},{ename:1,deptno:1,job:1}).sort({name:1})
+=======================================================================
+[count]
+db.member.find().count();  <= select count(*) from member
+
+db.member.find({userid:{$exists:true}});
+db.member.find({userid:{$exists:true}}).count(); <= select count(userid) from member
+
+db.member.find({age:{$gt:22}}).count(); <=select count(*) from member where age>22;
+
+db.member.findOne();
+db.member.find().limit(1); <= select * from member limit 1
+db.member.find({age:{$gt:22}}).sort({age:1}).limit(5) <= select * from member where age>22 limit 5
+
+=======================================================================
+[distinct]
+db.member.distinct("age"); <= select distinct(age) from member;
+db.emp.distinct("deptno")
+db.emp.distinct("job")
+db.member.distinct("age").length
+db.emp.distinct("deptno",{job:"MANAGER"})
+--------------------------------------------------------------------------------------------------------
+[실습] 
+<1> employees에서 30번 부서의 사원수를 출력하시오.
+<2> employees에서 보너스(comm)을 받는 사원의 수를 출력하시오
+<3> 직업이 SALESMAN이면서 보너스를 100이상 받는 사원수를 출력하시오
+<4> employees에서 중복되지 않는 부서번호를 출력하세요.
+<5> employees의 직업군을 보여주세요
+db.employees.find()
+
+//<1> employees에서 30번 부서의 사원수를 출력하시오.
+db.employees.find({deptno:30}).count()
+
+//<2> employees에서 보너스(comm)을 받는 사원의 수를 출력하시오
+db.employees.find({comm:{$exists:true}}).count()
+
+//<3> 직업이 SALESMAN이면서 보너스를 100이상 받는 사원수를 출력하시오
+db.employees.find({$and:[{job:'SALESMAN'},{comm:{$gt:100}}]}).count()
+--------------------------------------------------------------------------------------------------------
+참고: https://beagle-dev.tistory.com/160 [언젠간 되어있겠지]
+
+## Embeded Document (내장형 문서) 조회
+- MongoDB에서는 JSON객체 형태의 문서로 데이터를 저장하는데 문서안에 
+다시 문서의 내장된 문서의 형태로도 데이터를 저장할 수 있다.
+
+db.inventory.insertMany( [     
+{ item: "journal", qty: 25, size: { h: 14, w: 21, uom: "cm" }, status: "A" } , 
+{ item: "notebook", qty: 50, size: { h: 8.5, w: 11, uom: "in" }, status: "A" } , 
+{ item: "paper", qty: 100, size: { h: 8.5, w: 11, uom: "in" }, status: "D" } , 
+{ item: "planner", qty: 75, size: { h: 22.85, w: 30, uom: "cm" }, status: "D" } , 
+{ item: "postcard", qty: 45, size: { h: 10, w: 15.25, uom: "cm" }, status: "A" } 
+]);
+
+db.inventory.find({});
+
+db.inventory.find({size:{h:14, w:21, uom:'cm'}});
+
+db.inventory.find({size:{h:{$lt:10}}});//===> 결과 안나옴
+
+db.inventory.find({"size.h": {$lt : 10} } );//==> 결과 잘 나옴 select * from inventory where size.h < 10;
+
+
+db.inventory.find({"size.uom":"cm"}); //단위가 cm인 것들만 가져오기
+
+db.inventory.find({"size.h":{$lt:10}, status:"A"}); //size.h가 10미만이고 status가 A인 것들만 가져오기==> notebook가져옴
+--------------------------------------------------------------------------------------------------------
+ 4) 배열값 조회 MongoDB는 배열형태의 값을 저장할 수 있다
+ db.inventory.insertMany([
+	{ item: "journal", qty: 25, tags: ["blank", "red"], dim_cm: [ 14, 21 ] },
+	 { item: "notebook", qty: 50, tags: ["red", "blank"], dim_cm: [ 14, 21 ] },
+	 { item: "paper", qty: 100, tags: ["red", "blank", "plain"], dim_cm: [ 14, 21 ] },
+	 { item: "planner", qty: 75, tags: ["blank", "red"], dim_cm: [ 22.85, 30 ] },
+	 { item: "postcard", qty: 45, tags: ["blue"], dim_cm: [ 10, 15.25 ] } 
+	 ]);
+------------------------------------------
+배열 선택자
+$all: 주어진 조건의 모든 요소를 포함하는 배열
+$elemMatch: 주어진 조건의 모든 요소와 일치하는 배열
+$size: 주어진 크기 조건과 일치하는 배열
+------------------------------------------
+
+다음은 tags 필드에 오직 red값과 blank값만 배열에 존재하는 문서를 조회합니다.
+db.inventory.find( { tags: ["red", "blank"] } )
+위 경우는 red와 blank만 포함된 경우만 출력합니다
+다른 것이 포함된 경우는 출력되지 않습니다
+다음은 tags값에 red와 blank 값이 모두 존재하는 문서를 조회합니다
+db.inventory.find({tags:{$all:["red","blank"]}})
+이 경우는 red와 blank를 포함하고 다른 것들이 포함된 경우도 함께 출력됩니다
+
+다음은 배열이 포함된 필드에 배열 조회가 아닌 단일 값만 조회 값으로 입력했을때의 결과를 보겠습니다.
+db.inventory.find({tags:"red"})
+위결과는 red가 배열에 포함된 모든 문서를 출력합니다
+
+다음은 dim_cm 필드에 25이상 값이 포함된 문서를 출력합니다.
+db.inventory.find({dim_cm:{$gte : 25}})
+
+다음은 dim_cm필드에서 1번째 위치 즉 0번 인덱스에 있는 값 중 14이상인 값을 구합니다.
+db.inventory.find({"dim_cm.0": {$gte : 14}} )
+
+다음은 tags 배열의 크기가 2인 문서를 조회합니다.
+db.inventory.find({tags:{$size:2}})
+--------------------------------------------------------------------------------------------------------
+# Cursor 반복문
+find명령어는 cursor 형태의 객체로 반환된다.
+변수를 할당하고 아래와 같이 javascript반복문을 활용할 수 있다.
+
+db.member.find()
+var mycr=db.member.find({});
+while(mycr.hasNext()){
+ printjson(mycr.next());   
+}
+
+forEach()를 이용할 수도 있다.
+var cr=db.member.find({grade:'A'});
+cr.forEach(printjson);
+
+var cr2=db.member.find({grade:'B'});
+var docArr=cr2.toArray();
+var mydoc=docArr[0];
+mydoc
+# 기타 다양한 검색 - sort
+db.member.find({}).sort('age').limit(4)  <==나이 오름차순으로 정렬
+
+db.member.find({}).sort('age',pymongo.DESCENDING).limit(4)
+
+--------------------------------------------------------------------------------------------------------
+[3] UPDATE
+# replaceOne()을 이용한 도큐먼트 대체
+db.user.replaceOne({userid:'hong'},
+	{ name:'홍길동',
+	  passwd:'1234'});
+
+==>실행결과 : { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+
+- replaceOne(): _id 필드가 바뀌지 않는다. 교체를 하는 명령어이므로, 단순히 도큐먼트를 지우고 
+새로 생성하는 것과 다르게 도큐먼트 고유 값인 _id 필드는 바뀌지 않음
+
+#replaceOne()의 옵션 upsert
+db.user.replaceOne({userid:'hong2'},
+	{ name:'홍길동',
+	  passwd:'1234', userid:'hong2'}, {upsert:true});
+
+==> 실행결과 : {
+	"acknowledged" : true,
+	"matchedCount" : 0,
+	"modifiedCount" : 0,
+	"upsertedId" : ObjectId("6355f6782c84a5a910cf6f03")
+	}
+upsert옵션은 true값이 설정된 경우 쿼리한 도큐먼트가 없다면 쿼리한 내용으로 
+도큐먼트를 생성해서 수정한다.
+ 이결과 생성된 upsertId값이 반환된다.
+-----------------------------------------------------
+# updateOne()/updateMany() 를 이용한 수정
+- 특정 필드의 값을 바꾸거나, 증가,감소시키거나, 필드명을 변경하거나 필드 자체를 없애는 등의 기능을 수행할 수 있다
+
+db.member.updateMany({age:{$lt:22}},
+	{$set: {grade:'B'}}
+);
+--도큐먼트 수정 연산자--------------------------------
+$set : field값 설정
+$inc : field값을 증가시키거나 감소시킴
+$inc:{age:2} <= age값을 본래 값에서 2만큼 증가
+$mul: 곱한 값으로 수정
+$rename: 필드명을 새이름으로 변경한다
+$min: 필드의 값이 주어진 값보다 클 경우 새 값으로 교체합니다. 
+     만약 원래 값이 200이었고 $min의 값이 150이었다면 150으로 바뀝니다. 
+     기존 기록을 경신하는 경우 사용됩니다.
+$max: 필드의 값이 주어진 값보다 작을 경우 새 값으로 교체합니다. 
+만약 원래 값이 800이었고 $max의 값이 950이라면, 950으로 바뀝니다. 
+$currentDate: 해당 필드 값을 현재 날짜로 교체합니다. 
+두 가지 타입의 현재 날짜가 있는데 하나는 기본적으로 쓰이는 Date이고 
+다른 하나는 Timestamp입니다. 기본 타입을 사용하려면 그냥 true하면 되고, 
+timestamp 타입을 사용하려면 $type 연산자를 사용해야 합니다.
+{ $currentDate: { 필드: true } }
+{ $currentDate: { 필드: { $type: 'timestamp' } } }
+$unset
+해당 필드를 제거합니다. 만약 배열의 요소를 $unset한 경우에는 제거하진 않고 null로 교체합니다.
+$setOnInsert
+$set과 비슷한데 upsert의 경우에만 작동합니다. 만약 upsert가 일어나지 않으면 아무 동작도 하지 않습니다.
+--------------------------------------------------------------
+db.member.updateMany({age:{$gt:22}},{$set:{grade:'D'}}); 
+<= update member set grade='D' where age > 22;
+
+db.member.find();
+#한 개의 도큐먼트만 수정하려면 updateOne()을 이용하자.
+db.member.updateOne({age:{$gt:22}},{$set:{grade:'B'}});
+db.member.find();
+
+db.member.update({grade:'A'},{$inc:{age:1}}); 
+<= update member set age=age+1 where grade='A'
+
+db.member.update({userid:'hong'},{$mul:{age:2}})
+<= update member set age=age*2 where userid='hong'
+
+db.member.update({userid:'hong'},{$min:{age:20}})
+=>'hong'아이디인 사람의 나이가 20세보다 크면 20세로 수정함.
+Only updates the field if the specified value is less than the existing field value.
+
+db.member.update({userid:'hong'},{$max:{age:30}})
+==>아이디가 'hong'인 사람의 나이가 30세보다 작으면 30세로 수정함
+Only updates the field if the specified value is greater than the existing field value.
+
+db.member.updateMany({},{$rename:{'tel':'phone'}})
+==>모든 회원의 tel이란 필드명을 phone으로 변경 
+
+db.member.updateMany({},{$currentDate:{indate:true}})
+==> 모든 회원에 indate라는 필드에 현재날짜값으로 설정하여 추가함
+
+db.member.updateMany({},{$unset:{indate:""}})
+==>모든 회원에 indate 필드를 제거함
+------------------------------------------------------------
+#배열 수정
+   db.inventory.insertMany([
+	{ item: "journal", qty: 25, tags: ["blank", "red"], dim_cm: [ 14, 21 ] },
+	 { item: "notebook", qty: 50, tags: ["red", "blank"], dim_cm: [ 14, 21 ] },
+	 { item: "paper", qty: 100, tags: ["red", "blank", "plain"], dim_cm: [ 14, 21 ] },
+	 { item: "planner", qty: 75, tags: ["blank", "red"], dim_cm: [ 22.85, 30 ] },
+	 { item: "postcard", qty: 45, tags: ["blue"], dim_cm: [ 10, 15.25 ] } 
+	 ]);
+
+배열 요소의 일부를 수정하는 것은 매우 복잡하다.
+db.collection.updateMany({선택조건},
+		{<update연산자>:{"<array>.$[<identifier>]":value}},
+		{arrayFilters:[{<identifier>:<condition>}]}
+		);
+
+db.products.find({item:'pencil'})
+
+item이 pencil인 도큐먼트를 찾아서 tags 배열에 있는 값 중 blank를 'blue'로 변경하고자 한다면?
+
+db.products.updateMany({item:'pencil'},{$set:{'tags.$[tagsElem]':'blue'}},
+                            {arrayFilters:[{tagsElem:'blank'}]})
+==>tagElem이란 식별자는 변수처럼 이름을 지어주면 된다
+# ---배열수정 연산자------------
+$addToSet: 배열필드에 해당 요소가 없으면 추가하고 있으면 아무것도 하지 않습니다. 
+	몽고DB에서 자체적으로 배열에 해당 요소가 있는지 검사해주기 때문에 편합니다.
+	{ $addToSet: { 필드1: 값, 필드2: 값, ... } }
+
+$pop
+배열 메소드처럼 몽고DB 배열에서 맨 앞 또는 맨 뒤 요소를 꺼내는 겁니다. 
+shift와 pop을 합쳐놓은 연산자입니다. -1 값은 shift 기능, 1 값은 pop 기능을 합니다.
+	{ $pop: { 필드1: ±1, 필드2: ±1, ... } }
+
+$pull
+배열에서 조건을 만족하는 특정한 요소 하나를 제거한다. 꺼내는 조건은 쿼리 연산자와 같습니다.
+{ $pull: { 조건1, 조건2, ... } }
+$pullAll
+$pull 연산자와는 달리 $pullAll은 조건이 아니라 그냥 일치하는 값을 배열에서 꺼냅니다.
+{ $pullAll: { 필드: [값1, 값2, ...] } }
+$push
+배열 필드에 값을 push합니다. 
+{ $push: { 필드1: 값, 필드2: 값, ... } }
+조심해야할 것은 값이 배열일 경우 한 번에 push해버립니다. 
+만약 원래 [1, 2]라는 배열이 있다면 [3, 4, 5]를 push할 경우 [1, 2, [3, 4, 5]]가 되어버립니다. 
+3, 4, 5를 따로따로 push하고 싶다면
+{ $push: { 필드: { $each: 배열 } } }
+해야 합니다.
+
+$each
+방금 위에서도 사용되었습니다. 다른 용례로 $addToSet과 같이 사용하는 경우가 있습니다. 
+$addToSet도 $push처럼 한 번에 배열을 집어넣기 때문에 따로따로 넣고 싶다면
+{ $addToSet: { 필드: { $each: 배열 } } }
+해야 합니다.
+-----------------------------------------
+# $addToSet
+db.products.updateMany({item:'planner'},{$addToSet:{tags:'yellow'}}) 
+db.products.find({item:'planner'})
+===> ..."tags" : [
+        "blank",
+        "red",
+        "yellow"
+    ] yellow가 추가된 것 확인할 수 있다.
+
+# $pop
+db.products.updateMany({item:'planner'},{$pop:{tags:1}}) 
+=> yellow가 다시 삭제된 것 확인할 수 있다.
+
+# $pull
+db.products.updateMany({item:'planner'},{$pull:{tags:'red'}})   
+=> red를 제거함
+
+# $push
+db.products.updateMany({item:'planner'},{$push:{tags:'red'}})    
+=> red를 추가함
+
+# $push $each
+db.products.updateMany({item:'postcard'},{$push:{tags:{$each:['yellow','white']}}})                          
+db.products.find({item:'postcard'})
+--------------------------------------------------------------------------------------------------------
+[실습]
+use boardDB
+1. boardDB에서 작업한다
+2. 자유게시판에 아무 글이나 2~3개 작성한다. 특히 그 중에 글 하나에는 댓글 하나가 달린 상태로 생성해본다.
+3. 비밀게시판을 생성한다.
+4. 비밀게시판에 작성자가 'noname'값을 가지는 글을 하나 작성한다.
+5. 모든 글에 추천수 필드(upvote)를 추가하고 값을 0으로 설정한다
+6. 비밀게시판 글에 추천수를 1 증가시킨다
+7. 이미 댓글이 달린 자유게시판 글에 upvote 필드 없이 댓글을 추가한다.
+8. 이미 댓글이 달린 글에 방금 달은 댓글에(특징을 기억해서 수정하자) upvote 필드 값을 0으로 추가한다
+==>배열요소값 수정 arraysFilters 파라미터 사용해보기.
+--------------------------------------------------------------------------------------------------------
+ 55p, 77p
+
+use boardDB
+1,2.
+freeboard_id=db.board.find({name:'자유게시판'}).toArray()[0]._id;
+freeboard_id
+
+db.article.insertMany([
+{bid:freeboard_id,title:'오늘도 글을 씁니다',content:'즐거운 날입니다',writer:'허준'},
+{bid:freeboard_id,title:'내일도 글을 씁니다',content:'또 즐거운 날입니다',writer:'허준'},
+]);
+db.article.find()
+db.article.insert({bid:freeboard_id,title:'누가 댓글 좀 달아주세요',content:'부탁입니다',writer:'김철',
+		comments:[{writer:'송은희',content:'반갑습니다'}]})
+
+3, 4.
+secreteboard_id=db.board.insertOne({name:'비밀게시판'}).insertedId
+db.article.insertOne({bid:secreteboard_id,title:'Top Secret', content:'My Secrete Content',writer:'noname'})
+db.article.find({bid:secreteboard_id})
+
+5 모든 글에 추천수 필드(upvote)를 추가하고 값을 0으로 설정한다
+db.article.updateMany({},{$set:{upvote:0}})
+
+6. 비밀게시판 글에 추천수를 1 증가시킨다
+secreteboard_id=db.board.find({name:'비밀게시판'}).toArray()[0]._id
+secreteboard_id
+
+db.article.updateMany({bid:secreteboard_id},{$inc:{upvote:1}})
+db.article.find({bid:secreteboard_id})
+
+7. 이미 댓글이 달린 자유게시판 글에 upvote 필드 없이 댓글을 추가한다.
+freeboard_id=db.board.find({name:'자유게시판'}).toArray()[0]._id
+doc_id=db.article.find({bid:freeboard_id,writer:'김철'}).toArray()[0]._id
+
+db.article.updateOne({_id:doc_id},{$push:{comments:{writer:"김태희",content:"화이팅입니다!!"}}})
+db.article.find({_id:doc_id})
+
+8. 이미 댓글이 달린 글에 방금 달은 댓글에(특징을 기억해서 수정하자) upvote 필드 값을 0으로 추가한다
+db.article.updateOne({_id:doc_id}, {$set:{"comments.$[cmmEle].upvote":0}},
+		{arrayFilters:[{"cmmEle.writer":"김태희"}]})	  
+==>쌍따옴표 홑따옴표에 유의하자
+db.article.find({_id:doc_id})
+--------------------------------------------------------------------------------------------------------
+[4] DELETE
+- 1개 document 삭제
+- 여러 document 삭제
+db.member.deleteMany( <-----collection
+	{grade:'D'}  <===delete filter
+)
+
+전체 삭제하고자 할 때는
+db.member.deleteMany({})
+
+db.member.deleteMany({age:{$lt:23}}); <===delete from member where age < 23;
+[실습]
+1. 게시판의 모든 글을 삭제하시오
+2. 모든 게시판을 삭제하시오
+3. boardDB 데이터베이스를 삭제하시오.
+------------------------------------
+db.article.deleteMany()
+db.article.drop()
+db.boardDB.drop()
+db.dropDatabase()
+--------------------------------------------------------------------------------------------------------
+#몽고디비 집계 함수
+[1] count
+컬렉션 내 문서의 갯수를 조회한다.
+rdbms의 count와 같은 기능
+db.member.count()
+db.member.find({name:'홍길동'}).count()
+[count]
+db.member.find().count();  <= select count(*) from member
+
+db.member.find({userid:{$exists:true}}); //true대신 1값을 주어도 된다.
+db.member.find({userid:{$exists:true}}).count(); <= select count(userid) from member
+
+db.member.find({age:{$gt:22}}).count(); <=select count(*) from member where age>22;
+
+db.member.findOne();
+db.member.find().limit(1); <= select * from member limit 1
+=======================================================================
+[2] distinct
+db.member.distinct("age"); <= select distinct(age) from member;
+db.member.distinct("userid")
+
+# 도큐먼트를 집계하는 방법은 3가지가 있다
+[1] db의 모든 정보를 가져와 애플리케이션 단계에서 집계하는 방법
+[2] 몽고디비의 맵리듀스 기능을 이용하는 방법
+[3] 몽고디비의 집계 파이프라인 기능을 이용하는 방법
+- 이 중에 파이프라인기능을 이용하는 방법이 처리 속도도 빠르고 램메모리 소요도 적게쓴다. 
+   다만 자유도는 나쁜 편(주어진 연산자로만 가져오는데 때로 원하는 결과를 얻지 못할 수 있음)
+- 집계 명령은 수많은 데이터를 처리해서 작은 양의 정보를 애플리케이션에 전달하는 특징이 있다.
+  정보를 최대한 작게 만든후 앱으로 작아진 정보를 전송하는 것이 더 효율적임
+- 많은양의 정보를 몽고디비 내부에서 처리한다면 많은 양의 램메모리가 필요하지 않게된다.
+- 집계 파이프라인 명령어는 도큐먼트를 순차적으로 받아서 집계 처리를 몽고디비 내부에서 한다.
+  맵리듀스 방식은 자바스크립트 엔진과 정보교환을 위해 램을 사용하는데 이때 대량의 메모리가 필요하게 된다.
+  집계 파이프라인을 사용하는 것이 가장 합리적으로 보이지만,
+  하지만 상황에 따라 맵리듀스로 처리해야 한다던지 애플리케이션에서 집계처리해야 할때도 있다.
+--------------------------------------------------------------------------------------------------------
+# 집계 파이프라인 명령어
+$project : select절
+$match: where절
+$group: group by 절
+$sort: order by 절
+$limit
+$unwind
+$geoNear
+
+db.articles.insertMany([
+    { "_id" : ObjectId("512bc95fe835e68f199c8686"), "author" : "john", "score" : 80, "views" : 100 },
+    { "_id" : ObjectId("512bc962e835e68f199c8687"), "author" : "john", "score" : 85, "views" : 521 },
+    { "_id" : ObjectId("55f5a192d4bede9ac365b257"), "author" : "ahn", "score" : 60, "views" : 1000 },
+    { "_id" : ObjectId("55f5a192d4bede9ac365b258"), "author" : "li", "score" : 55, "views" : 5000 },
+    { "_id" : ObjectId("55f5a1d3d4bede9ac365b259"), "author" : "annT", "score" : 60, "views" : 50 },
+    { "_id" : ObjectId("55f5a1d3d4bede9ac365b25a"), "author" : "li", "score" : 94, "views" : 999 },
+    { "_id" : ObjectId("55f5a1d3d4bede9ac365b25b"), "author" : "ty", "score" : 95, "views" : 1000 }
+]
+//select  author, score from articles
+db.articles.aggregate([
+{ $project:{_id:0,author:1, score:1} }
+])
+
+// select * from articles where author = 'john'
+db.articles.aggregate([
+    {$match:{author:'john'}}
+])
+
+// select * from articles where score>=80
+db.articles.aggregate([
+  { $match: { score: { $gte:80} } }
+])
+
+//select * from articles where author='li' and score>=60
+db.articles.aggregate([
+{ $match: {author:'li', score:{$gte: 60} }}
+])
+
+//select author, sum(score) as total from srticles group by author
+//having total > 100
+db.articles.aggregate([
+{ 
+    $group:{_id:'$author', total:{$sum:'$score'}}
+},
+{
+    $match:{total:{$gt:100}}
+}
+])
+
+$group을  사용하기 위해서는  _id 값에 그룹화의 기준이 되는 값을 설정해야 한다.
+위에서는 author를 기준으로 그룹화를 진행하도록 했다.
+------------------------------------------------------------------
+db.createCollection('orders')
+show collections
+db.orders.deleteMany({})
+db.orders.insertMany([
+{
+      cust_id: "abc123",
+      ord_date: ISODate("2012-01-02T17:04:11.102Z"),
+      status: 'A',
+      price: 100,
+      items: [ { sku: "xxx", qty: 25, price: 1 },
+               { sku: "yyy", qty: 25, price: 1 } ]
+    },
+    {
+      cust_id: "abc123",
+      ord_date: ISODate("2012-01-02T17:04:11.102Z"),
+      status: 'A',
+      price: 500,
+      items: [ { sku: "xxx", qty: 25, price: 1 },
+               { sku: "yyy", qty: 25, price: 1 } ]
+    },
+    {
+      cust_id: "abc123",
+      ord_date: ISODate("2012-01-02T17:04:11.102Z"),
+      status: 'B',
+      price: 130,
+      items: [ { sku: "jkl", qty: 35, price: 2 },
+               { sku: "abv", qty: 35, price: 1 } ]
+    },
+    {
+      cust_id: "abc123",
+      ord_date: ISODate("2012-01-02T17:04:11.102Z"),
+      status: 'B',
+      price: 230,
+      items: [ { sku: "jkl", qty: 25, price: 2 },
+               { sku: "abv", qty: 25, price: 1 } ]
+    },
+    {
+      cust_id: "abc123",
+      ord_date: ISODate("2012-01-02T17:04:11.102Z"),
+      status: 'A',
+      price: 130,
+      items: [ { sku: "xxx", qty: 15, price: 1 },
+               { sku: "yyy", qty: 15, price: 1 } ]
+    },
+    {
+      cust_id: "abc456",
+      ord_date: ISODate("2012-02-02T17:04:11.102Z"),
+      status: 'C',
+      price: 70,
+      items: [ { sku: "jkl", qty: 45, price: 2 },
+               { sku: "abv", qty: 45, price: 3 } ]
+    },
+    {
+      cust_id: "abc456",
+      ord_date: ISODate("2012-02-02T17:04:11.102Z"),
+      status: 'A',
+      price: 150,
+      items: [ { sku: "xxx", qty: 35, price: 4 },
+               { sku: "yyy", qty: 35, price: 5 } ]
+    },
+    {
+      cust_id: "abc456",
+      ord_date: ISODate("2012-02-02T17:04:11.102Z"),
+      status: 'B',
+      price: 20,
+      items: [ { sku: "jkl", qty: 45, price: 2 },
+               { sku: "abv", qty: 45, price: 1 } ]
+    },
+    {
+      cust_id: "abc456",
+      ord_date: ISODate("2012-02-02T17:04:11.102Z"),
+      status: 'B',
+      price: 120,
+      items: [ { sku: "jkl", qty: 45, price: 2 },
+               { sku: "abv", qty: 45, price: 1 } ]
+    },
+    {
+      cust_id: "abc780",
+      ord_date: ISODate("2012-02-02T17:04:11.102Z"),
+      status: 'B',
+      price: 260,
+      items: [ { sku: "jkl", qty: 50, price: 2 },
+               { sku: "abv", qty: 35, price: 1 } ]
+    }
+])
+db.orders.find()
+//주문 컬렉션에서 총 주문건수를 가져와 보여주세요
+//select count(*) as count from orders
+db.orders.aggregate([
+    {
+        $group:{
+            _id:null,
+            count:{$sum:1}
+        }
+    }
+])
+-----------------
+$sum:1 의 의미는 도큐먼트 하나당 1을 더하라는 의미.
+
+//고객아이디별 구매가격총액을 가져와 보여주세요
+//select cust_id, sum(price) as totalPrice from orders group by cust_id
+db.orders.aggregate([
+{ $group:{_id:'$cust_id', totalPrice:{$sum:'$price'}}}
+])
+------------------
+//고객아이디별 구매가격총액을 가져와 보여주되 주문총액 오름차순으로 보여주세요
+//select cust_id, sum(price) as totalPrice from orders group by cust_id order by total
+db.orders.aggregate([
+{$group:{_id:'$cust_id', totalPrice:{$sum:'$price'}}},
+{$sort:{totalPrice:1}}
+])
+
+$sort:{totalPrice:1}
+1값을 주면 오름차순, -1 값을 주면 내림차순 정렬이된다
+
+//고객별 최소구매가와 최대구매가를 보여주세요
+//select min(price) MinPrice, max(price) MaxPrice from orders group by cust_id
+db.orders.aggregate([
+{$group:{_id:'$cust_id',MinPrice:{$min:'$price'}, MaxPrice:{$max:'$price'}}}
+])
+
+//고객별 평균구매가를 보여주세요
+db.orders.aggregate([
+{$group:{_id:'$cust_id', AvgPrice:{$avg:'$price'}}}
+])
+
+//고객의 주문날자별 구매총액을 보여주세요
+//select cust_id, ord_date, sum(price) as totalPrice
+//from orders group by cust_id, ord_date
+db.orders.aggregate([
+{
+    $group:{
+        _id:{
+            cust_id:'$cust_id',
+            ord_date:{$dateToString:{format:'%Y-%m-%d', date:'$ord_date'}}
+            },
+        totalPrice:{$sum:'$price'}
+        }
+}
+])
+//2개이상 필드로 group화할때는
+//_id:{}로 묶어, key1값:'$필드명', key2값:'$필드명' 식으로 기술한다.
+----------------------
+//고객별 주문건수가 1개를 초과하는 데이터를 보여주세요
+//select cust_id, count(*) from orders group by cust_id having count(*) > 1
+db.orders.aggregate([
+    {
+        $group:{_id:'$cust_id', count:{$sum:1}}
+    },
+    {
+        $match:{count:{$gt:1}}
+    }
+])
+//having절은 $match로
+---------------------------
+//[실습] status별로 묶어 주문건수는 2개이상인 데이터를 가져와 보여주세요
+//select status, count(*) from orders group by status having count(*) > 1
+db.orders.aggregate([
+    {$group:{_id:'$status',
+    count:{$sum:1}}},
+    {$match:{count:{$gt:1}}}
+])
+-----------------------------
+//[실습] status별 주문총액을 가져와 출력하세요
+//select status, sum(price) as totalPrice from orders group by status
+db.orders.aggregate([
+    {
+        $group:{_id:'$status', totalPrice:{$sum:'$price'}}
+    }
+])
+-----------------------------
+
+//select cust_id, ord_date, sum(price) as totalPrice
+//from orders group by cust_id, ord_date
+//having totalPrice > 250
+
+db.orders.aggregate([
+    {
+        $group:{
+            _id:{
+                cust_id:'$cust_id',
+                ord_date:{$dateToString:{format:'%Y-%m-%d', date:'$ord_date'}}
+            },
+            totalPrice:{$sum:'$price'}
+        }
+    },
+    {
+        $match:{totalPrice:{$gt:250}}
+    }
+])
+//아래부분 실습 아직 안해봄///////////////////////////////////////////////
+//select cust_id, sum(price) as total from orders where status='A' group by cust_id
+db.orders.aggregate([
+    {$match:{status:'B'}},
+    {$group:{_id:'$cust_id',total:{$sum:'$price'}}}
+])
+
+//select cust_id, ord_date, sum(price) as total from orders where status='B'
+//group by cust_id, ord_date having total > 250
+db.orders.aggregate([
+    {$match:{status:'B'}},
+    {$group:{_id:
+                {cust_id:'$cust_id',
+                 ord_date:{$dateToString: { format: "%Y-%m-%d", date: "$ord_date" }}},
+    total:{$sum:'$price'}}},
+    {$match:{total:{$gt:250}}}
+])
+
+/*
+select cust_id, sum(li.qty) as qty
+from orders o, order_lineitem li
+where o.id = li.order_id
+group by cust_id
+*/
+db.orders.aggregate([
+    {$unwind:'$items'},
+    {$group:{_id:'$cust_id',qty:{$sum:'$items.qty'}}}
+])
+
+db.orders.find()
+
+/*
+select count(*)
+from
+(select cust_id, ord_date
+from orders
+group by cust_id, ord_date) as d
+*/
+db.orders.aggregate([
+    {$group:{_id:{cust_id:'$cust_id',ord_date:{$dateToString: { format: "%Y-%m-%d", date: "$ord_date" }}}}},
+    {$group:{_id:null,count:{$sum:1}}}
+])
+
+
+
+//items collection 생성
+db.createCollection('items')
+show collections
+db.items.insertMany([
+    { "_id" : 1, "item" : "abc", "price" : 10, "quantity" : 2, "date" : ISODate("2014-03-01T08:00:00Z") },
+    { "_id" : 2, "item" : "jkl", "price" : 20, "quantity" : 1, "date" : ISODate("2014-03-01T09:00:00Z") },
+    { "_id" : 3, "item" : "xyz", "price" : 5, "quantity" : 10, "date" : ISODate("2014-03-15T09:00:00Z") },
+    { "_id" : 4, "item" : "xyz", "price" : 5, "quantity" : 20, "date" : ISODate("2014-04-04T11:21:39.736Z") },
+    { "_id" : 5, "item" : "abc", "price" : 10, "quantity" : 10, "date" : ISODate("2014-04-04T21:23:13.331Z") }
+])
+
+//
+db.items.aggregate([
+    {$group:{_id:{year:{$year:'$date'},month:{$month:'$date'},day:{$dayOfMonth:'$date'}},
+             totalPrice:{$sum:{$multiply:['$price','$quantity']}},
+             avgQuantity:{$avg:'$quantity'},
+             count:{$sum:1}}}
+])
+
+db.createCollection('inventory')
+db.inventory.insertOne({ "_id" : 1, "item" : "ABC1", sizes: [ "S", "M", "L"] })
+db.inventory.find()
+db.inventory.aggregate([
+    {$unwind:'$sizes'}
+])
+=============================================================================================
+#몽고디비에 사용자 계정 만들기
+- 먼저 cmd로 도스에서 mongod로 몽고디비를 실행한다
+- cmd로 명령 프롬프트를 하나 더 띄워 mongo를 입력한다.
+- mongo를 입력하면 프롬프트가 >로 바뀐다.
+# 먼저 관리자 디비로 전환하여 생성하자-admin 디비를 사용하도록 한다.
+use admin
+
+show roles 하면 권한목록을 볼 수 있다.
+
+db.createUser({user:'scott', pwd:'tiger', roles:['root']})
+
+를 입력하자.
+데이터베이스 관리자가 많아지면 역할에 따라 권한을 다르게 줄 수 있다.
+- mongod 를 띄웠던 것을 종료한 뒤 다시 실행하는데
+  mongod -auth 를 입력한다. 인증을 사용해서 몽고를 실행하겠다는 뜻이다.
+- mongo로 접속했던 프롬프트도 종료한 후, 다시 실행해서 
+   mongo admin -u 이름 -p 비밀번호로 접속한다.
+--------------------------------------------------------------------------------------------------------
+# mydb에서도 사용자 계정을 생성해보자. 
+mydb에서는 root 롤을 부여할 수 없으므로 role을 readWrite로 부여하자
+
+use mydb
+db.createUser({user:'swan',pwd:'tiger',roles:[{role:'readWrite',db:'mydb'}], mechanisms:['SCRAM-SHA-1']})
+
+//mechanisms:['SCRAM-SHA-1'] ==>수업할 땐 이건 빼고 해보자. (빼고해도 되는지 테스트 안해봄)
+----------------------------------------------------------------------------------------
+https://docs.mongodb.com/manual/core/security-scram/
+db.auth():데이터베이스에 사용자 인증
+db.createUser():Creates a new user
+db.updateUser():Updates user data
+db.changeUserPassword():사용자 패스워드 변경
+db.dropAllUsers():데이터베이스에 관련된 모든 사용자를 삭제한다.
+db.dropUser():한 사용자를 삭제한다
+db.grantRolesToUser():롤과 권한을 사용자에 허용한다
+db.revokeRolesFromUser():사용자에 부여한 롤을 삭제한다
+db.getUser():지정한 사용자의 정보를 반환한다
+db.getUsers():데이터베이스에 관련된 모든 사용자의 정보를 반환한다
+출처: https://inpa.tistory.com/599 
+
+#몽고디비 import/export하기 위해서는 mongodb tools를 설치해야 한다
+[1] https://www.mongodb.com/try/download/database-tools
+zip파일을 다운로드 후 압축을 풀고
+[2] 압축푼경로/bin까지 제어판에서   path를 잡아주자.
+
+[3] export방법
+mongod실행후
+도스창을 새로 열어서 아래 입력
+#mydb에 있는 member 컬렉션을 myfile.json으로  export해보자.
+mongoexport -d mydb -c member --jsonArray -o myfile.json --port 27017
+https://webisfree.com/2017-07-30/mongodb-%EC%99%B8%EB%B6%80%ED%8C%8C%EC%9D%BC-import-export-%EB%B0%A9%EB%B2%95
+
+-d 또는 --database 데이터베이스 이름
+-c 또는 --collection 컬렉션 이름
+-o 또는 --output 저장할 파일이름
+--port 포트번호
+--jsonArray 배열 형태로 반환해야 할 경우
+
+[4] import방법
+#myfile.json파일에 있는 데이터=>mydb2로 member 컬렉션을 import해보자.
+mongoimport -d mydb2 -c member --file myfile.json --jsonArray --port 27017
+
+
+! mongoimport 사용시 컬렉션에 중복된 값이 존재하는 경우
+동일한 컬렉션이 이미 존재하는 경우 mongoimport 사용시 새롭게 추가하게 됩니다. 이때 만약 기존의 값들을 무시가하고 새롭게 변경하려고 하는 경우... 즉 기존 컬렉션을 비우고 새롭게 업데이트 하려면 --drop 옵션을 사용하는 --것이 가능합니다.
+mongoimport -d databaseName -c collectionName --drop --file myFile.json
+
+! mongoexport, mongoimport 로그인이 필요한 경우
+계정 설정의 인증이 필요한 경우 유저 아이디 및 패스워드가 필요합니다. 만약 아이디와 패스워드가 있는 경우 아래처럼 내보내거나 가져올 수 있습니다.
+
+mongoexport -u username -p 'password' -d databaseName -c collectionName --out myfile.json --port 27017 --authenticationDatabase admin
+
+! 인증시 꼭 --authenticationDatabase admin 추가할 것
+위 명령어에서 --authenticationDatabase admin을 추가하지 않으면 다음과 같이 인증에러가 발생할 수 있습니다. user와 password만 설정하는 경우도 발생할 수 있으니 참고하세요.
